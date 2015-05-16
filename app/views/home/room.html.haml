@@ -2,6 +2,15 @@
 .container-fluid
   .col-md-8
     .coding-area
+      #editor
+      function foo(items) {
+      var x = "All this is syntax highlighted";
+      return x;
+      }
+    :javascript
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/monokai");
+      editor.getSession().setMode("ace/mode/javascript");
   .col-md-4
     .row
       #video-grid
