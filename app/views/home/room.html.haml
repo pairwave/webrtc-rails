@@ -1,24 +1,27 @@
 %script{src: '/javascripts/rtc/client_signaling.js'}
-.container
-  .row
-    #video-grid
-      .col-xs-12.col-md-12
-        %video#remoteVideo{ "autoplay" => "",}
-      .col-md-2.col-xs-2
-        %video#localVideo{  "autoplay" => "", "muted" => "" }
-  .row
-    =# %textarea.form-control{ rows: 7 }
-    .panel.panel-primary
-      .panel-heading
-        Chat
-      .panel-body#js-chat-body
-    %br
-    .input-group
-      %input.form-control#js-input-im{ type: 'text', placeholder: 'Send a Message'}
-      %span.input-group-btn
-        %button.btn.btn-primary#js-send-button-im{ type: "button"}
-          Send
-  %button.btn.btn-error#js-hangup{ type: "button"}
+.container-fluid
+  .col-md-8
+    .coding-area
+  .col-md-4
+    .row
+      #video-grid
+        .col-xs-12.col-md-12
+          %video#remoteVideo{ "autoplay" => "",}
+        .col-md-2.col-xs-2
+          %video#localVideo{  "autoplay" => "", "muted" => "" }
+    .row#chat-grid
+      =# %textarea.form-control{ rows: 7 }
+      .panel.panel-primary
+        .panel-heading
+          Chat
+        .panel-body#js-chat-body
+      %br
+      .input-group
+        %input.form-control#js-input-im{ type: 'text', placeholder: 'Send a Message'}
+        %span.input-group-btn
+          %button.btn.btn-primary#js-send-button-im{ type: "button"}
+            Send
+    %button.btn.btn-error#js-hangup{ type: "button"}
     Hang Up
 :javascript
   var user_name = prompt("Your user name?");
@@ -48,9 +51,10 @@
 
   function mediaObjectIM(user, message) {
     var leftRight = user === user_name ? 'right' : 'left'
+    var imageColor = user === user_name ? '2376BB' : '0A5A9C'
     return "  <div class='media'>"+
            "    <a class='pull-"+ leftRight +"' href='#'>"+
-           "      <img class='media-object' src='http://placehold.it/45x45'>"+
+           "      <img class='media-object' src='http://placehold.it/45x45/" + imageColor + "/&text=" + user[0].toUpperCase() + "'>"+
            "    </a>"+
            "    <div class='media-body', style='text-align: "+ leftRight +"'>"+
            "      <h4 class='media-heading'>"+ user +"</h4>"+
