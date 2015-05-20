@@ -3,11 +3,6 @@
   .col-md-8
     .coding-area
       #editor
-    :javascript
-      var editor = ace.edit("editor");
-      editor.setTheme("ace/theme/github");
-      editor.getSession().setMode("ace/mode/javascript");
-      editor.setShowPrintMargin(false);
   .col-md-4
     .row
       #video-grid
@@ -30,6 +25,32 @@
     %button.btn.btn-error#js-hangup{ type: "button"}
     Hang Up
 :javascript
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/github");
+  editor.getSession().setMode("ace/mode/javascript");
+  editor.setShowPrintMargin(false);
+
+  // Black magic, do not question, just use it.
+  var lastDelta;
+  var lastCode;
+
+  $(document).keyup( function() {
+
+    if($("#editor").hasClass("ace_focus")) {
+      sendCECode(editor.getSession().getDocument().getValue());
+    }
+  });
+
+
+  /*editor.on("change", function(e) {
+
+    $(document).keyup( function() {
+      if(!sameDelta(e.data, lastDelta)) {
+        sendCEDelta(e.data);
+      }
+    });
+  });*/
+
   var user_name = prompt("Your user name?");
 
   var $sendButton = $("#js-send-button-im");
@@ -45,6 +66,14 @@
     socket.emit('message',{message: {content: content, user: user_name}, type: 'im', room: room});
   }
 
+  function sendCECode(code) {
+  socket.emit('message', {message: {content: code, user: user_name, cursor: editor.getCursorPosition()}, type: 'cec', room: room});
+  }
+
+  function sendCEDelta(delta) {
+    socket.emit('message', {message: {content: delta, user: user_name}, type: 'ced', room: room});
+  }
+
   function checkEnterKey(event) {
     if ( event.keyCode == 13 ) {
       $sendButton.click();
@@ -53,6 +82,49 @@
 
   function appendNewIM(user, message) {
     $chatBody.prepend(mediaObjectIM(user, message));
+  }
+
+  function appendNewCED(user, message) {
+
+    lastDelta = message;
+
+    if (user_name !== user) {
+
+      editor.getSession().getDocument().applyDeltas([message]);
+    }
+  }
+
+  function appendNewCEC(user, message, cursor) {
+
+    lastCode = message;
+
+    userCursor = editor.getCursorPosition();
+
+    editor.getSession().getDocument().setValue(message);
+    editor.navigateTo(userCursor.row, userCursor.column);
+
+  }
+
+  function sameCode(code_1, code_2) {
+
+    return code_1 === code_2;
+  }
+
+  function sameDelta(delta_1, delta_2) {
+
+    try {
+
+      return (delta_1.action === delta_2.action)
+          && (delta_1.range.start.row === delta_2.range.start.row)
+          && (delta_1.range.start.column === delta_2.range.start.column)
+          && (delta_1.range.end.row === delta_2.range.end.row)
+          && (delta_1.range.end.column === delta_2.range.end.column)
+          && (delta_1.range.text === delta_2.range.text);
+
+    } catch(err) {
+      return false;
+    }
+
   }
 
   function mediaObjectIM(user, message) {

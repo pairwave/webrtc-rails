@@ -1,4 +1,5 @@
-var socket = io.connect('192.168.1.37:2013');
+// Set your server ip address
+var socket = io.connect('10.21.6.12:2013');
 // var socket = io.connect('127.0.0.1:2013');
 
 // var room = "room-name" //prompt("Enter room name:");
@@ -41,5 +42,9 @@ socket.on("message", function(data) {
     appendNewIM(data.message.user, data.message.content);
   }else if (data.type === 'by') {
     stop();
+  }else if(data.type === 'cec') {
+    appendNewCEC(data.message.user, data.message.content, data.message.cursor);
+  }else if(data.type === 'ced') {
+    appendNewCED(data.message.user, data.message.content);
   }
 })
